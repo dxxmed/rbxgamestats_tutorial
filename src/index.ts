@@ -5,14 +5,14 @@ const PORT = 5000;
 const Server = http.createServer((req, res) => {
     if (req.url === "/" || req.url === "/home") {
         res.setHeader("Content-Type", "application/json");
-        res.end({
+        res.end(JSON.stringify({
             message: "Home Page"
-        });
+        }));
     } else if (req.url === "/users") {
         res.setHeader("Content-Type", "application/json");
-        res.end({
+        res.end(JSON.stringify({
             message: "Users Page"
-        });
+        }));
     }
 });
 
