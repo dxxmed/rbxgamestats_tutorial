@@ -13,12 +13,12 @@ function GetBody(req: http.IncomingMessage): Promise<string> {
         let Body = "";
         
         req.on("data", chunk => {
-            Body += chunk;
+            Body += chunk.toString();
         });
 
         req.on("end", () => {
             try {
-                resolve(JSON.parse(Body) || {});
+                resolve(Body);
             } catch(error) {
                 reject(error);
             };
