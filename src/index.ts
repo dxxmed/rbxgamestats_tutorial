@@ -8,7 +8,7 @@ config();
 const URI = process.env.URI || process.env.ENVURI;
 const PORT = process.env.PORT || 5000;
 
-function GetBody(req: http.IncomingMessage): Promise<string> {
+function GetBody(req: http.IncomingMessage): Promise<object> {
     return new Promise((resolve, reject) => {
         let Body = "";
         
@@ -38,7 +38,7 @@ const Server = http.createServer(async (req, res) => {
         if (req.url.match(/\/users\/([0-9]+)/)) {
             const UserId = parseInt(req.url.split("/")[2]);
             try {
-                const Data = await Product.find({"UserId": UserId});
+                const Data = await Product.find({UserId: UserId});
                 res.writeHead(200, {"Content-Type": "application/json"});
                 res.end(JSON.stringify(Data));
             } catch(error) {
@@ -46,7 +46,7 @@ const Server = http.createServer(async (req, res) => {
                 res.end(JSON.stringify({
                     message: `Unable to find data for Player with UserId "${UserId}"!`,
                 }));
-            }
+            };
         } else {
             try {
                 const Data = await Product.find({});
@@ -57,8 +57,8 @@ const Server = http.createServer(async (req, res) => {
                 res.end(JSON.stringify({
                     message: "Unable to get all Player data!",
                 }));
-            }
-        }
+            };
+        };
         return;
     } else if (req.url.match(/\/users\/([0-9]+)/)) {
         const UserId = parseInt(req.url.split("/")[2]);
@@ -77,16 +77,35 @@ const Server = http.createServer(async (req, res) => {
             return;
         } else if (req.method === "DELETE") {
             try {
-                const Body = await GetBody(req);
-                
-            } catch(error) {
+                const Data = await Product.findOneAndDelete({UserId: UserId});
                 res.writeHead(200, {"Content-Type": "application/json"});
+                res.end(JSON.stringify(Data));
+            } catch(error) {
+                res.writeHead(500, {"Content-Type": "application/json"});
                 res.end(JSON.stringify({
                     message: `Unable to delete data for Player with UserId ${UserId}!`,
                 }));
             };
-        }
-    }
+            return;
+        } else if(req.method === "PATCH") {
+            try {
+                const Body = await GetBody(req);
+                const Data = await Product.findOneAndUpdate({UserId: UserId}, Body);
+                res.writeHead(200, {"Content-Type": "application/json"});
+                res.end(JSON.stringify(Data));
+            } catch(error) {
+                res.writeHead(500, {"Content-Type": "application/json"});
+                res.end(JSON.stringify({
+                    message: `Unable to patch data for Player with UserId ${UserId}!`,
+                }));
+            };
+            return;
+        };
+    };
+    res.writeHead(404, {"Content-Type": "application/json"});
+    res.end(JSON.stringify({
+        message: "Route not found!",
+    }));
 });
 
 mongoose.set("strictQuery", false);
