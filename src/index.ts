@@ -1,8 +1,11 @@
 import http from "http";
 import mongoose from "mongoose";
+import { config } from "dotenv";
 import Product, { Schema } from "./Models/model.js"
 
-const URI = process.env.URI;
+config();
+
+const URI = process.env.URI || process.env.ENVURI;
 const PORT = process.env.PORT || 5000;
 
 function GetBody(req: http.IncomingMessage): Promise<string> {
@@ -58,18 +61,18 @@ const Server = http.createServer(async (req, res) => {
         }
         return;
     } else if (req.url.match(/\/users\/([0-9]+)/)) {
-        console.log("Hello world!");
         const UserId = parseInt(req.url.split("/")[2]);
         if (req.method === "POST") {
             try {
                 const Body = await GetBody(req);
+                console.log("The BODY:");
                 console.log(Body);
                 const Data = await Product.create(Body);
                 res.writeHead(200, {"Content-Type": "application/json"});
                 res.end(JSON.stringify(Data));
             } catch(error) {
                 console.log("ERROR:");
-                console.log(JSON.parse(error));
+                console.log(error);
                 res.writeHead(500, {"Content-Type": "application/json"});
                 res.end(JSON.stringify({
                     message: `Unable post data for Player with UserId ${UserId}!`,
