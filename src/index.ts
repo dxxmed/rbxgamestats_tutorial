@@ -13,12 +13,12 @@ function GetBody(req: http.IncomingMessage): Promise<string> {
         let Body = "";
         
         req.on("data", chunk => {
-            Body += chunk.toString();
+            Body += chunk;
         });
 
         req.on("end", () => {
             try {
-                resolve(Body);
+                resolve(JSON.parse(Body));
             } catch(error) {
                 reject(error);
             };
@@ -65,14 +65,10 @@ const Server = http.createServer(async (req, res) => {
         if (req.method === "POST") {
             try {
                 const Body = await GetBody(req);
-                console.log("The BODY:");
-                console.log(Body);
                 const Data = await Product.create(Body);
                 res.writeHead(200, {"Content-Type": "application/json"});
                 res.end(JSON.stringify(Data));
             } catch(error) {
-                console.log("ERROR:");
-                console.log(error);
                 res.writeHead(500, {"Content-Type": "application/json"});
                 res.end(JSON.stringify({
                     message: `Unable post data for Player with UserId ${UserId}!`,
