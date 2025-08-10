@@ -58,6 +58,7 @@ const Server = http.createServer(async (req, res) => {
         }
         return;
     } else if (req.url.match(/\/users\/([0-9]+)/)) {
+        console.log("Hello world!");
         const UserId = parseInt(req.url.split("/")[2]);
         if (req.method === "POST") {
             try {
@@ -67,6 +68,8 @@ const Server = http.createServer(async (req, res) => {
                 res.writeHead(200, {"Content-Type": "application/json"});
                 res.end(JSON.stringify(Data));
             } catch(error) {
+                console.log("ERROR:");
+                console.log(error);
                 res.writeHead(500, {"Content-Type": "application/json"});
                 res.end(JSON.stringify({
                     message: `Unable post data for Player with UserId ${UserId}!`,
