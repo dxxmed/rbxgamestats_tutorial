@@ -69,7 +69,7 @@ const Server = http.createServer(async (req, res) => {
                 res.end(JSON.stringify(Data));
             } catch(error) {
                 console.log("ERROR:");
-                console.log(error);
+                console.log(JSON.parse(error));
                 res.writeHead(500, {"Content-Type": "application/json"});
                 res.end(JSON.stringify({
                     message: `Unable post data for Player with UserId ${UserId}!`,
