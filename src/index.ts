@@ -18,7 +18,7 @@ function GetBody(req: http.IncomingMessage): Promise<string> {
 
         req.on("end", () => {
             try {
-                resolve(JSON.parse(Body));
+                resolve(JSON.parse(Body) || {});
             } catch(error) {
                 reject(error);
             };
