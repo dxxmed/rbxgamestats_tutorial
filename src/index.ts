@@ -1,7 +1,6 @@
 import http from "http";
 import mongoose from "mongoose";
 import Product, { Schema } from "./Models/model.js"
-import { json } from "stream/consumers";
 
 const URI = process.env.URI;
 const PORT = process.env.PORT || 5000;
@@ -34,14 +33,15 @@ const Server = http.createServer(async (req, res) => {
         }));
     } else if (req.url.match("/users") && req.method === "GET") {
         if (req.url.match(/\/users\/([0-9]+)/)) {
+            const UserId = parseInt(req.url.split("/")[2]);
             try {
-                const Data = await Product.find({"UserId": req.url.split("/")[2]});
+                const Data = await Product.find({"UserId": UserId});
                 res.writeHead(200, {"Content-Type": "application/json"});
                 res.end(JSON.stringify(Data));
             } catch(error) {
                 res.writeHead(500, {"Content-Type": "application/json"});
                 res.end(JSON.stringify({
-                    message: error,
+                    message: `Unable to find data for Player with UserId "${UserId}"!`,
                 }));
             }
         } else {
@@ -52,27 +52,37 @@ const Server = http.createServer(async (req, res) => {
             } catch(error) {
                 res.writeHead(500, {"Content-Type": "application/json"});
                 res.end(JSON.stringify({
-                    message: error,
+                    message: "Unable to get all Player data!",
                 }));
             }
         }
         return;
     } else if (req.url.match(/\/users\/([0-9]+)/)) {
+        const UserId = parseInt(req.url.split("/")[2]);
         if (req.method === "POST") {
             try {
                 const Body = await GetBody(req);
+                console.log(Body);
                 const Data = await Product.create(Body);
-                res.writeHead(500, {"Content-Type": "application/json"});
+                res.writeHead(200, {"Content-Type": "application/json"});
                 res.end(JSON.stringify(Data));
             } catch(error) {
                 res.writeHead(500, {"Content-Type": "application/json"});
                 res.end(JSON.stringify({
-                    message: error,
+                    message: `Unable post data for Player with UserId ${UserId}!`,
                 }));
             };
             return;
         } else if (req.method === "DELETE") {
-            // delete stuff to comply with roblox's player data policy
+            try {
+                const Body = await GetBody(req);
+                
+            } catch(error) {
+                res.writeHead(200, {"Content-Type": "application/json"});
+                res.end(JSON.stringify({
+                    message: `Unable to delete data for Player with UserId ${UserId}!`,
+                }));
+            };
         }
     }
 });
